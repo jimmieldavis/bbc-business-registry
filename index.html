@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bible Based Church | Member Business Registry</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* ══════════════════════════════════════════════════════════════
+       BBC BRANDING TOKENS | sourced from bbctallahassee.com
+       Primary: deep forest green. Accent: orange. Secondary: coral.
+       ══════════════════════════════════════════════════════════════ */
+    :root {
+      --primary:          #032B22;  /* BBC deep green */
+      --primary-dark:     #011A14;  /* derived darker */
+      --primary-light:    #0A4A3B;  /* derived lighter */
+      --neutral:          #EFEDE7;  /* BBC warm off-white */
+      --accent:           #F68B20;  /* BBC orange */
+      --secondary-accent: #ED503F;  /* BBC coral */
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    ::selection { background: rgba(3,43,34,0.2); }
+
+    body {
+      font-family: 'DM Sans', Helvetica, Arial, sans-serif;
+      background: var(--neutral);
+      color: #333;
+      min-height: 100vh;
+    }
+
+    /* ── HEADER ── */
+    .header {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+      padding: 32px 24px 0;
+    }
+    .header-inner { max-width: 760px; margin: 0 auto; }
+    .header-top { display: flex; align-items: center; gap: 16px; margin-bottom: 8px; }
+    .header-icon {
+      width: 80px; height: 80px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .header-icon img {
+      width: 100%; height: 100%;
+      object-fit: contain;
+    }
+    .header h1 {
+      color: #fff; font-size: 28px; font-weight: 700;
+      font-family: 'Playfair Display', Georgia, serif;
+      line-height: 1.2;
+    }
+    .header .subtitle {
+      color: rgba(255,255,255,0.8); font-size: 14px;
+      letter-spacing: 3px; text-transform: uppercase;
+      margin-top: 2px;
+    }
+    .header .motto {
+      color: rgba(255,255,255,0.6); font-size: 12px;
+      margin: 8px 0 24px;
+      border-left: 3px solid var(--accent);
+      padding-left: 12px;
+      font-style: italic;
+    }
+
+    /* ── FORM CARD ── */
+    .form-card {
+      max-width: 760px;
+      margin: -20px auto 40px;
+      background: #fff;
+      border-radius: 14px;
+      padding: 36px 40px;
+      box-shadow: 0 4px 30px rgba(0,0,0,0.08);
+      border: 1px solid #eee;
+      position: relative;
+      z-index: 1;
+    }
+    .form-card h2 {
+      font-size: 22px; color: var(--primary);
+      font-family: 'Playfair Display', Georgia, serif;
+      margin-bottom: 6px;
+    }
+    .form-card .intro {
+      font-size: 14px; color: #666; margin-bottom: 28px; line-height: 1.6;
+    }
+
+    /* ── FIELDS ── */
+    .field { margin-bottom: 20px; }
+    .field label {
+      display: block; font-size: 12px; font-weight: 600;
+      color: #444; margin-bottom: 6px;
+      text-transform: uppercase; letter-spacing: 0.8px;
+    }
+    .field label .req { color: var(--primary); }
+    .field .hint {
+      font-size: 11px; color: #999; margin-top: 4px;
+    }
+
+    .field input, .field select, .field textarea {
+      width: 100%; padding: 11px 14px;
+      font-size: 14px; font-family: 'DM Sans', Helvetica, sans-serif;
+      border: 1.5px solid #ddd; border-radius: 8px;
+      outline: none; transition: all 0.2s;
+      background: #fff; color: #222;
+    }
+    .field textarea { min-height: 70px; resize: vertical; }
+    .field input:focus, .field select:focus, .field textarea:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(3,43,34,0.1);
+    }
+    .field input::placeholder, .field textarea::placeholder { color: #bbb; }
+    .field select { appearance: none; cursor: pointer;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      padding-right: 36px;
+    }
+    .field select option[value=""] { color: #bbb; }
+
+    .row { display: flex; gap: 16px; flex-wrap: wrap; }
+    .row .col-2 { flex: 2 1 280px; }
+    .row .col-1 { flex: 1 1 160px; }
+    .row .col-sm { flex: 1 1 100px; }
+
+    .divider {
+      border-top: 1px solid #eee;
+      margin: 8px 0 24px;
+      position: relative;
+    }
+    .divider span {
+      position: absolute; top: -10px; left: 16px;
+      background: #fff; padding: 0 8px;
+      font-size: 11px; color: #bbb;
+      text-transform: uppercase; letter-spacing: 1px;
+    }
+
+    .field-other { display: none; }
+    .field-other.visible { display: block; }
+
+    /* ── BUTTON ── */
+    .submit-btn {
+      width: 100%; padding: 14px;
+      font-size: 15px; font-weight: 700;
+      color: #fff;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+      border: none; border-radius: 10px;
+      cursor: pointer; letter-spacing: 0.5px;
+      font-family: 'DM Sans', Helvetica, sans-serif;
+      transition: all 0.2s;
+      margin-top: 8px;
+    }
+    .submit-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(3,43,34,0.3); }
+    .submit-btn:active { transform: translateY(0); }
+    .submit-btn:disabled { background: #ccc; cursor: not-allowed; transform: none; box-shadow: none; }
+
+    /* ── STATUS MESSAGES ── */
+    .status {
+      margin-top: 16px; padding: 14px 18px;
+      border-radius: 8px; font-size: 14px;
+      text-align: center; font-weight: 600;
+      display: none;
+    }
+    .status.success { display: block; background: #E8F5E9; color: #2E7D32; }
+    .status.error { display: block; background: #FFEBEE; color: #C62828; }
+    .status.loading { display: block; background: #FFF3E0; color: #E65100; }
+
+    /* ── FOOTER ── */
+    .footer {
+      text-align: center; padding: 24px;
+      border-top: 1px solid #e8e0d8;
+      font-size: 11px; color: #aaa;
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 600px) {
+      .form-card { padding: 24px 20px; margin: -16px 12px 32px; }
+      .header { padding: 24px 16px 0; }
+      .header h1 { font-size: 22px; }
+      .row { flex-direction: column; gap: 0; }
+      .row .col-2, .row .col-1, .row .col-sm { flex: 1 1 100%; }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-in { animation: fadeIn 0.4s ease; }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <div class="header-inner">
+      <div class="header-top">
+        <div class="header-icon"><img src="images/logo.png" alt="Bible Based Church logo"></div>
+        <div>
+          <h1>Bible Based Church</h1>
+          <div class="subtitle">Member Business Registry</div>
+        </div>
+      </div>
+      <div class="motto">A directory of businesses owned by members of Bible Based Church, Incorporated.</div>
+    </div>
+  </div>
+
+  <div class="form-card animate-in">
+    <h2>Register Your Business</h2>
+    <p class="intro">
+      This registry connects member-owned businesses across the Bible Based Church community.
+      Required fields are marked with an asterisk. Your information will be reviewed by BBC administrators.
+    </p>
+
+    <form id="businessForm" onsubmit="return false;">
+
+      <!-- ────── BUSINESS IDENTITY ────── -->
+      <div class="divider"><span>Business Identity</span></div>
+
+      <div class="field">
+        <label>Business Name <span class="req">*</span></label>
+        <input type="text" id="businessName" placeholder="e.g. Faith Tax Services LLC" required>
+      </div>
+
+      <div class="row">
+        <div class="field col-1">
+          <label>EIN (optional)</label>
+          <input type="text" id="ein" placeholder="XX-XXXXXXX">
+          <div class="hint">Employer Identification Number. Optional.</div>
+        </div>
+        <div class="field col-1">
+          <label>Year Founded</label>
+          <input type="text" id="yearFounded" placeholder="e.g. 2018" maxlength="4" pattern="\d{4}">
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Industry <span class="req">*</span></label>
+        <select id="industry" required onchange="toggleOtherIndustry()">
+          <option value="">Select an industry</option>
+          <option value="Retail">Retail</option>
+          <option value="Restaurant and Food Service">Restaurant and Food Service</option>
+          <option value="Professional Services">Professional Services</option>
+          <option value="Health and Wellness">Health and Wellness</option>
+          <option value="Real Estate">Real Estate</option>
+          <option value="Construction and Trades">Construction and Trades</option>
+          <option value="Beauty and Personal Care">Beauty and Personal Care</option>
+          <option value="Education and Coaching">Education and Coaching</option>
+          <option value="Technology">Technology</option>
+          <option value="Nonprofit and Ministry">Nonprofit and Ministry</option>
+          <option value="Arts and Media">Arts and Media</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+      <div class="field field-other" id="otherIndustryField">
+        <label>Specify Industry</label>
+        <input type="text" id="industryOther" placeholder="Enter industry">
+      </div>
+
+      <!-- ────── OWNER IDENTITY ────── -->
+      <div class="divider"><span>Owner Identity</span></div>
+
+      <div class="row">
+        <div class="field col-2">
+          <label>Owner Full Name <span class="req">*</span></label>
+          <input type="text" id="ownerName" placeholder="e.g. Jane A. Doe" required>
+        </div>
+        <div class="field col-1">
+          <label>BBC Role <span class="req">*</span></label>
+          <select id="ownerRole" required>
+            <option value="">Select role</option>
+            <option value="Member">Member</option>
+            <option value="Leader">Leader</option>
+            <option value="Visitor">Visitor</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="field col-1">
+          <label>Owner Email <span class="req">*</span></label>
+          <input type="email" id="ownerEmail" placeholder="jane@example.com" required>
+        </div>
+        <div class="field col-1">
+          <label>Owner Phone</label>
+          <input type="tel" id="ownerPhone" placeholder="(850) 555-0100">
+        </div>
+      </div>
+
+      <!-- ────── BUSINESS CONTACT ────── -->
+      <div class="divider"><span>Business Contact</span></div>
+
+      <div class="field">
+        <label>Business Address</label>
+        <input type="text" id="businessAddress" placeholder="123 Main Street">
+      </div>
+
+      <div class="row">
+        <div class="field col-2">
+          <label>City</label>
+          <input type="text" id="businessCity" placeholder="Tallahassee">
+        </div>
+        <div class="field col-sm">
+          <label>State</label>
+          <select id="businessState">
+            <option value="">--</option>
+          </select>
+        </div>
+        <div class="field col-sm">
+          <label>ZIP</label>
+          <input type="text" id="businessZip" placeholder="32305">
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="field col-1">
+          <label>Business Phone</label>
+          <input type="tel" id="businessPhone" placeholder="(850) 555-0100">
+        </div>
+        <div class="field col-1">
+          <label>Business Email</label>
+          <input type="email" id="businessEmail" placeholder="hello@yourbusiness.com">
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Website</label>
+        <input type="url" id="website" placeholder="https://yourbusiness.com">
+      </div>
+
+      <div class="field">
+        <label>Social Handles</label>
+        <textarea id="socials" placeholder="e.g. IG: @yourhandle, FB: /YourBusiness, LinkedIn: /in/yourname"></textarea>
+        <div class="hint">Optional. Comma-separated.</div>
+      </div>
+
+      <button type="button" class="submit-btn" id="submitBtn" onclick="submitForm()">
+        Register Business
+      </button>
+
+      <div class="status" id="statusMsg"></div>
+    </form>
+  </div>
+
+  <div class="footer">
+    Bible Based Church, Incorporated &copy; <script>document.write(new Date().getFullYear())</script>
+  </div>
+
+  <script>
+    // ══════════════════════════════════════════════════════════════
+    // PLACEHOLDER: replace with deployed Apps Script web app URL
+    // ══════════════════════════════════════════════════════════════
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwoQsFt2KC-7bkqQapfftr46SlR0CI4MPo_WAFfBqH3HS9BMlX8A7fo3mh2ocAC9aWtKA/exec";
+
+    // Populate state dropdown
+    (function() {
+      const states = [
+        "AL","AK","AZ","AR","CA","CO","CT","DE","FL","GA","HI","ID","IL","IN","IA",
+        "KS","KY","LA","ME","MD","MA","MI","MN","MS","MO","MT","NE","NV","NH","NJ",
+        "NM","NY","NC","ND","OH","OK","OR","PA","RI","SC","SD","TN","TX","UT","VT",
+        "VA","WA","WV","WI","WY","DC"
+      ];
+      const sel = document.getElementById("businessState");
+      states.forEach(s => {
+        const opt = document.createElement("option");
+        opt.value = s; opt.textContent = s;
+        sel.appendChild(opt);
+      });
+    })();
+
+    function toggleOtherIndustry() {
+      const field = document.getElementById("otherIndustryField");
+      const val = document.getElementById("industry").value;
+      field.classList.toggle("visible", val === "Other");
+    }
+
+    function showStatus(type, msg) {
+      const el = document.getElementById("statusMsg");
+      el.className = "status " + type;
+      el.textContent = msg;
+      if (type === "success") {
+        setTimeout(() => { el.className = "status"; }, 6000);
+      }
+    }
+
+    async function submitForm() {
+      const btn = document.getElementById("submitBtn");
+
+      const businessName = document.getElementById("businessName").value.trim();
+      const industrySel = document.getElementById("industry").value;
+      const industryOther = document.getElementById("industryOther").value.trim();
+      const ownerName = document.getElementById("ownerName").value.trim();
+      const ownerRole = document.getElementById("ownerRole").value;
+      const ownerEmail = document.getElementById("ownerEmail").value.trim();
+
+      if (!businessName || !industrySel || !ownerName || !ownerRole || !ownerEmail) {
+        showStatus("error", "Please fill in all required fields (marked with *).");
+        return;
+      }
+
+      const industry = industrySel === "Other" && industryOther ? industryOther : industrySel;
+
+      const data = {
+        businessName: businessName,
+        ein: document.getElementById("ein").value.trim(),
+        industry: industry,
+        yearFounded: document.getElementById("yearFounded").value.trim(),
+        ownerName: ownerName,
+        ownerRole: ownerRole,
+        ownerEmail: ownerEmail,
+        ownerPhone: document.getElementById("ownerPhone").value.trim(),
+        businessAddress: document.getElementById("businessAddress").value.trim(),
+        businessCity: document.getElementById("businessCity").value.trim(),
+        businessState: document.getElementById("businessState").value,
+        businessZip: document.getElementById("businessZip").value.trim(),
+        businessPhone: document.getElementById("businessPhone").value.trim(),
+        businessEmail: document.getElementById("businessEmail").value.trim(),
+        website: document.getElementById("website").value.trim(),
+        socials: document.getElementById("socials").value.trim(),
+        source: "Web Portal",
+        timestamp: new Date().toISOString()
+      };
+
+      if (APPS_SCRIPT_URL === "YOUR_APPS_SCRIPT_WEB_APP_URL_HERE") {
+        showStatus("error", "Setup incomplete: the Google Apps Script URL has not been configured. See setup_guide_v01.md.");
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = "Submitting...";
+      showStatus("loading", "Sending your registration...");
+
+      try {
+        await fetch(APPS_SCRIPT_URL, {
+          method: "POST",
+          mode: "no-cors",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data)
+        });
+
+        showStatus("success", "Registration submitted. Welcome to the BBC Member Business Registry.");
+        btn.textContent = "Register Business";
+        btn.disabled = false;
+
+        document.getElementById("businessForm").reset();
+        document.getElementById("otherIndustryField").classList.remove("visible");
+
+      } catch (err) {
+        showStatus("error", "Something went wrong. Please try again or contact a BBC administrator.");
+        btn.textContent = "Register Business";
+        btn.disabled = false;
+        console.error("Submission error:", err);
+      }
+    }
+  </script>
+</body>
+</html>
